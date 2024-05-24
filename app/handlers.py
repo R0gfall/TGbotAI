@@ -7,6 +7,8 @@ from config import image_path, model5_path, download_image_path
 import app.button as button
 from data.database import connect_to_database
 from global_bot import bot
+from backend.crypt import hash_password, check_password
+
 
 router = Router()
 
@@ -56,8 +58,17 @@ async def register_password(message: types.Message, state: FSMContext):
     data_register["stable_login"] = True
     print(data_register)
 
+    # добавление хэшированного пароля в бд
+    new_password = hash_password(data_register["password"])
+    print(new_password)
+    print(check_password(data_register["password"], new_password))
+
+    # answer_bd = connect_to_database(TypeLog.REGISTRATION, data_register["ID_user"], data_register["login"],
+    #                                data_register["password"])
+
     answer_bd = connect_to_database(TypeLog.REGISTRATION, data_register["ID_user"], data_register["login"],
-                                    data_register["password"])
+                                    new_password)
+
     if answer_bd == command_list[0]:
         await state.clear()
         await message.answer(answer_bd)
@@ -75,16 +86,23 @@ async def login_password(message: types.Message, state: FSMContext):
     print(message.from_user.id)
     data_register["stable_login"] = True
 
+    new_password = hash_password(data_register["password"])
+    # print(new_password)
+    # print(check_password(data_register["password"], new_password))
+
+    # answer_bd = connect_to_database(TypeLog.LOGIN, data_register["ID_user"], data_register["login"],
+    #                                 data_register["password"])
+
     answer_bd = connect_to_database(TypeLog.LOGIN, data_register["ID_user"], data_register["login"],
                                     data_register["password"])
+
     if answer_bd == command_list[2]:
         await state.clear()
         await message.answer(answer_bd)
 
     elif answer_bd == command_list[3]:
         await state.set_state(OnOff.online)
-        print('set_onlite_state'
-        )
+        print('set_onlite_state')
         await message.answer(answer_bd, reply_markup=button.dop_reply_keyboard)
 
 

@@ -1,8 +1,10 @@
 from multiprocessing import connection
+import bcrypt
 
 import psycopg2
 from config import host, user, port, password, database_name
 from app.states import TypeLog
+from backend.crypt import check_password, hash_password
 
 
 def connect_to_database(type_doing: TypeLog, id_chat: int, login_user: str, password_user: str) -> str:
@@ -46,18 +48,25 @@ def user_in_database(id_chat: int, login_user: str, password_user: str, type_doi
             else:
                 cursor.execute(
                     """INSERT INTO users_table (id_user_chat, login_user, password_user, stable_flag, admin_count)
-                    VALUES (%s, %s, %s, true, 0);""", (id_chat, login_user, password_user),
+                    VALUES (%s, %s, %s, true, 0);""", (id_chat, login_user, password_user.decode('utf-8')),
                 )
                 print("User registered for this ID chat")
+                print(password_user)
                 return "User registered successfully!"
 
     elif type_doing == TypeLog.LOGIN:
         with connection.cursor() as cursor:
+            # cursor.execute(
+            #     """SELECT * FROM users_table
+            #     WHERE login_user = %s and password_user = %s;""", (login_user, password_user,)
+            # )
             cursor.execute(
-                """SELECT * FROM users_table
-                WHERE login_user = %s and password_user = %s;""", (login_user, password_user,)
+                """SELECT password_user FROM users_table
+                WHERE login_user = %s""", (login_user,)
             )
-            if cursor.fetchone() is None:
+            result = cursor.fetchone()
+
+            if check_password(password_user, result[0]) == False:
                 print("Incorrect credentials")
                 return "Incorrect credentials!"
 
