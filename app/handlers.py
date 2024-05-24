@@ -135,3 +135,6 @@ async def predict_picture(message: types.Message, state: FSMContext):
         await message.answer(msg_answer)
 
         await state.set_state(OnOff.online)
+
+
+
