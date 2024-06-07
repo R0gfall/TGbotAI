@@ -91,7 +91,7 @@ async def login_password(message: types.Message, state: FSMContext):
 @router.message(F.text == "exit")
 @router.message(filters.Command("logout"))
 async def logout_command(message: types.Message, state: FSMContext):
-    if await state.get_state() == OnOff.online:
+    if await state.get_state() == OnOff.online or await state.get_state() == OnOff.predict_image:
         # Изменить состояние пользователя в бд на False
         data_register = await state.get_data()
         data_register["ID_user"] = message.from_user.id

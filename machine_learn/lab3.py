@@ -67,14 +67,14 @@ train_generator = train_datagen.flow_from_directory(
         'train/', 
         classes=['pinguin', 'human'],
         target_size=(200, 200),
-        batch_size=5,
+        batch_size=50,
         class_mode='binary')
 
 validation_generator = validation_datagen.flow_from_directory(
         'valid/', 
         classes=['pinguin', 'human'],
         target_size=(200, 200),
-        batch_size=19,
+        batch_size=15,
         class_mode='binary',
         shuffle=False)
 
@@ -89,7 +89,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(),
               metrics=['accuracy'])
 
 history = model.fit(train_generator,
-      steps_per_epoch=8,
+      steps_per_epoch=10,
       epochs=15,
       verbose=1,
       validation_data=validation_generator,
