@@ -18,13 +18,13 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 # cat -> dandelion -> p
 # dog -> grass -> h
 
-train_dandelion_dir = os.path.join('train/pinguin')
+train_dandelion_dir = os.path.join('C:\\Users\\PCLe\\Lab3\\TGbot\\TGbotAI\\photoData\\train\\pinguin')
 
-train_grass_dir = os.path.join('train/human')
+train_grass_dir = os.path.join('C:\\Users\\PCLe\\Lab3\\TGbot\\TGbotAI\\photoData\\train\\human')
 
-valid_dandelion_dir = os.path.join('../valid/pinguin')
+valid_dandelion_dir = os.path.join('C:\\Users\\PCLe\\Lab3\\TGbot\\TGbotAI\\photoData\\valid\\pinguin')
 
-valid_grass_dir = os.path.join('../valid/human')
+valid_grass_dir = os.path.join('C:\\Users\\PCLe\\Lab3\\TGbot\\TGbotAI\\photoData\\valid\\human')
 
 train_dandelion_names = os.listdir(train_dandelion_dir)
 
@@ -47,36 +47,36 @@ fig.set_size_inches(ncols * 4, nrows * 4)
 
 pic_index += 8
 next_dandelion_pic = [os.path.join(train_dandelion_dir, fname)
-                for fname in train_dandelion_names[pic_index-8:pic_index]]
+                      for fname in train_dandelion_names[pic_index - 8:pic_index]]
 next_grass_pic = [os.path.join(train_grass_dir, fname)
-                for fname in train_grass_names[pic_index-8:pic_index]]
+                  for fname in train_grass_names[pic_index - 8:pic_index]]
 
 for i, img_path in enumerate(next_dandelion_pic + next_grass_pic):
-  sp = plt.subplot(nrows, ncols, i + 1)
-  sp.axis('Off')
+    sp = plt.subplot(nrows, ncols, i + 1)
+    sp.axis('Off')
 
-  img = mpimg.imread(img_path)
-  plt.imshow(img)
+    img = mpimg.imread(img_path)
+    plt.imshow(img)
 
 plt.show()
 
-train_datagen = ImageDataGenerator(rescale=1/255)
-validation_datagen = ImageDataGenerator(rescale=1/255)
+train_datagen = ImageDataGenerator(rescale=1 / 255)
+validation_datagen = ImageDataGenerator(rescale=1 / 255)
 
 train_generator = train_datagen.flow_from_directory(
-        'train/', 
-        classes=['pinguin', 'human'],
-        target_size=(200, 200),
-        batch_size=50,
-        class_mode='binary')
+    'C:\\Users\\PCLe\\Lab3\\TGbot\\TGbotAI\\photoData\\train',
+    classes=['pinguin', 'human'],
+    target_size=(200, 200),
+    batch_size=10,
+    class_mode='binary')
 
 validation_generator = validation_datagen.flow_from_directory(
-        'valid/', 
-        classes=['pinguin', 'human'],
-        target_size=(200, 200),
-        batch_size=15,
-        class_mode='binary',
-        shuffle=False)
+    'C:\\Users\\PCLe\\Lab3\\TGbot\\TGbotAI\\photoData\\valid',
+    classes=['pinguin', 'human'],
+    target_size=(200, 200),
+    batch_size=10,
+    class_mode='binary',
+    shuffle=False)
 
 model = tf.keras.models.Sequential([tf.keras.layers.Flatten(input_shape=(200, 200, 3)),
                                     tf.keras.layers.Dense(128, activation=tf.nn.relu),
@@ -84,26 +84,28 @@ model = tf.keras.models.Sequential([tf.keras.layers.Flatten(input_shape=(200, 20
 
 model.summary()
 
+print(f'Total training images: {train_generator.samples}')
+print(f'Total validation images: {validation_generator.samples}')
+
+
+
 model.compile(optimizer=tf.keras.optimizers.Adam(),
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
 history = model.fit(train_generator,
-      steps_per_epoch=10,
-      epochs=15,
+      steps_per_epoch=70,
+      epochs=20,
       verbose=1,
       validation_data=validation_generator,
-      validation_steps=8)
+      validation_steps=29)
 
+model.save('modelW.keras')
 
-model.save('model.h5')
-
-
-
-uploaded = ['test1_p.jpg', 'test2_p.jpg', 'test3_h.jpg', 'test4_h.jpg', 'test5_h.jpg']
+uploaded = ['test1_p.jpg', 'test2_p.jpg', 'test3_h.jpg', 'test5_h.jpg']
 
 for fn in uploaded:
-    path = 'content/' + fn
+    path = 'C:\\Users\\PCLe\\Lab3\\TGbot\\TGbotAI\\content\\' + fn
     img = image.load_img(path, target_size=(200, 200))
     x = image.img_to_array(img)
     plt.imshow(x / 255.)
@@ -115,5 +117,4 @@ for fn in uploaded:
         print(fn + " is a pinguin")
     else:
         print(fn + " is a human")
-
 
